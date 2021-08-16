@@ -104,10 +104,37 @@ def chat() :
         results= model.predict([bag_of_words(inp , words)] )
         results_index=numpy.argmax(results)
         tag=labels[results_index]
-        print(tag)
         for tg in data["intents"] :
             if tg["tag"]==tag :
                 responses=tg["responses"]
                 print(random.choice(responses))
 
-chat()
+#Flask part
+
+@main.after_request
+def after_request(response):
+    header = response.headers
+    header['Access-Control-Allow-Origin'] = '*'
+    header['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
+    header['Access-Control-Allow-Methods'] = 'OPTIONS, HEAD, GET, POST, DELETE, PUT'
+    return response
+
+@main.route("/chat/<string:inp>", methods=['GET'])
+def chatDef(inp):
+    print("Start talking with the bot , type quit to stop the chatbot")
+    while True :
+        #inp=input("you : ")
+        if inp.lower() == "quit" :
+            break
+        results= model.predict([bag_of_words(inp , words)] )
+        results_index=numpy.argmax(results)
+        tag=labels[results_index]
+        print(tag)
+        for tg in data["intents"] :
+            if tg["tag"]==tag :
+                responses=tg["responses"]
+                #print(random.choice(responses))
+                #return random.choice(responses)
+                return jsonify({"responses": random.choice(responses)})
+if __name__ == "__main__":
+    main.run()
