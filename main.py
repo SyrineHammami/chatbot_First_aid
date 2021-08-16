@@ -11,6 +11,10 @@ import nltk
 import pickle
 nltk.download('punkt')
 
+from flask import Flask, jsonify, request
+
+main = Flask(__name__)
+
 with open("intents.json") as file:
     data = json.load(file)
 
